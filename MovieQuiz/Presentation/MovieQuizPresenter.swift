@@ -87,6 +87,14 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         return text
     }
     
+    func convert(model: QuizQuestion) -> QuizStepViewModel {
+        QuizStepViewModel(
+            image: UIImage(data: model.image) ?? UIImage(),
+            question: model.text,
+            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)"
+        )
+    }
+    
     //  MARK: - Private Methods
     private func isLastQuestion() -> Bool {
         currentQuestionIndex == questionsAmount - 1
@@ -101,15 +109,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     private func switchToNextQuestion() {
         currentQuestionIndex += 1
     }
-    
-    func convert(model: QuizQuestion) -> QuizStepViewModel {
-        QuizStepViewModel(
-            image: UIImage(data: model.image) ?? UIImage(),
-            question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)"
-        )
-    }
-    
     
     private func didAnswer(isYes: Bool) {
         guard let currentQuestion = currentQuestion else {
