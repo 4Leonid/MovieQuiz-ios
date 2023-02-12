@@ -12,7 +12,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
     //  MARK: - Private Properties
-    //private let alertPresenter = AlertPresenter()
+    private var alertPresenter: AlertPresenter!
     private var presenter: MovieQuizPresenter!
     
     // MARK: - Lifecycle
@@ -21,6 +21,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         //alertPresenter.viewController = self
         setFonts()
         presenter = MovieQuizPresenter(viewController: self)
+        alertPresenter = AlertPresenter(viewController: self)
     }
     
     //  MARK: - UIStatusBarStyle
@@ -48,21 +49,14 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     func show(quiz result: QuizResultsViewModel) {
         let message = presenter.makeResultMessage()
         
-        let alert = UIAlertController(
+        let alert = AlertModel(
             title: result.title,
             message: message,
-            preferredStyle: .alert
-        )
-        
-        let action = UIAlertAction(
-            title: result.buttonText,
-            style: .default) { [weak self] _ in
+            buttonText: result.buttonText) { [weak self] in
                 guard let self = self else { return }
                 self.presenter.restartGame()
             }
-        alert.addAction(action)
-        alert.view.accessibilityIdentifier = "alert"
-        present(alert, animated: true)
+        alertPresenter.showAlert(model: alert)
     }
     
     func highlightImageBorder(isCorrectAnswer: Bool) {
@@ -86,18 +80,14 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     func showNetWorkError(message: String) {
         hideLoadingIndicator()
         
-        let alert = UIAlertController(
+        let alert = AlertModel(
             title: "Ошибка",
             message: message,
-            preferredStyle: .alert
-        )
-        
-        let action = UIAlertAction(title: "Попробовать еще раз", style: .default) { [weak self] _ in
-            guard let self = self else { return }
-            self.presenter.restartGame()
-        }
-        alert.view.accessibilityIdentifier = "alert"
-        alert.addAction(action)
+            buttonText: "Попробовать еще раз") { [weak self] in
+                guard let self = self else { return }
+                self.presenter.restartGame()
+            }
+        alertPresenter.showAlert(model: alert)
     }
     
     //  MARK: -  Private Methods
