@@ -55,32 +55,10 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     }
     
     //  MARK: - Public Methods
-    func isLastQuestion() -> Bool {
-        currentQuestionIndex == questionsAmount - 1
-    }
-    
-    func didAnswer(isCorrectAnswer: Bool) {
-        if isCorrectAnswer {
-            correctAnswers += 1
-        }
-    }
-
     func restartGame() {
         currentQuestionIndex = 0
         correctAnswers = 0
         questionFactory?.requestNextQuestion()
-    }
-    
-    func switchToNextQuestion() {
-        currentQuestionIndex += 1
-    }
-    
-    func convert(model: QuizQuestion) -> QuizStepViewModel {
-        QuizStepViewModel(
-            image: UIImage(data: model.image) ?? UIImage(),
-            question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)"
-        )
     }
     
     func yesButtonClicked() {
@@ -89,45 +67,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     func noButtonClicked() {
         didAnswer(isYes: false)
-    }
-    
-    private func didAnswer(isYes: Bool) {
-        guard let currentQuestion = currentQuestion else {
-            return
-        }
-        
-        let givenAnswer = isYes
-        
-        proceedWithAnswer(isCorrect: givenAnswer == currentQuestion.correctAnswer)
-    }
-    
-    func proceedWithAnswer(isCorrect: Bool) {
-        didAnswer(isCorrectAnswer: isCorrect)
-        
-        viewController?.highlightImageBorder(isCorrectAnswer: isCorrect)
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self else { return }
-            self.proceedToNextQuestionOrResults()
-            
-        }
-    }
-    
-    func proceedToNextQuestionOrResults() {
-        if isLastQuestion() {
-            let text = correctAnswers == questionsAmount
-            ? "Поздравляем, вы ответили на 10 из 10!"
-            : "Вы ответили на \(correctAnswers) из \(questionsAmount), попробуйте еще раз"
-            
-            let viewModel = QuizResultsViewModel(
-                title: "Этот раунд окончен!",
-                text: text,
-                buttonText: "Сыграть еще раз")
-            viewController?.show(quiz: viewModel)
-        } else {
-            switchToNextQuestion()
-            questionFactory?.requestNextQuestion()
-        }
     }
     
     func makeResultMessage() -> String {
@@ -146,5 +85,68 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             """
         
         return text
+    }
+    
+    //  MARK: - Private Methods
+    private func isLastQuestion() -> Bool {
+        currentQuestionIndex == questionsAmount - 1
+    }
+    
+    private func didAnswer(isCorrectAnswer: Bool) {
+        if isCorrectAnswer {
+            correctAnswers += 1
+        }
+    }
+
+    private func switchToNextQuestion() {
+        currentQuestionIndex += 1
+    }
+    
+    private func convert(model: QuizQuestion) -> QuizStepViewModel {
+        QuizStepViewModel(
+            image: UIImage(data: model.image) ?? UIImage(),
+            question: model.text,
+            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)"
+        )
+    }
+    
+    
+    private func didAnswer(isYes: Bool) {
+        guard let currentQuestion = currentQuestion else {
+            return
+        }
+        
+        let givenAnswer = isYes
+        
+        proceedWithAnswer(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+    }
+    
+    private func proceedWithAnswer(isCorrect: Bool) {
+        didAnswer(isCorrectAnswer: isCorrect)
+        
+        viewController?.highlightImageBorder(isCorrectAnswer: isCorrect)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+            self.proceedToNextQuestionOrResults()
+            
+        }
+    }
+    
+    private func proceedToNextQuestionOrResults() {
+        if isLastQuestion() {
+            let text = correctAnswers == questionsAmount
+            ? "Поздравляем, вы ответили на 10 из 10!"
+            : "Вы ответили на \(correctAnswers) из \(questionsAmount), попробуйте еще раз"
+            
+            let viewModel = QuizResultsViewModel(
+                title: "Этот раунд окончен!",
+                text: text,
+                buttonText: "Сыграть еще раз")
+            viewController?.show(quiz: viewModel)
+        } else {
+            switchToNextQuestion()
+            questionFactory?.requestNextQuestion()
+        }
     }
 }
