@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
     
     //  MARK: - IB Outlets
     @IBOutlet private var imageView: UIImageView!
@@ -9,9 +9,7 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet private var counterLabel: UILabel!
     @IBOutlet private var noButton: UIButton!
     @IBOutlet private var yesButton: UIButton!
-    
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
-    
     
     //  MARK: - Private Properties
     //private let alertPresenter = AlertPresenter()
@@ -20,8 +18,8 @@ final class MovieQuizViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        setFonts()
         //alertPresenter.viewController = self
+        setFonts()
         presenter = MovieQuizPresenter(viewController: self)
     }
     
@@ -29,7 +27,6 @@ final class MovieQuizViewController: UIViewController {
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
-    
     
     //  MARK: - IB Actions
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
