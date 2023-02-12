@@ -64,6 +64,7 @@ final class MovieQuizViewController: UIViewController {
                 self.presenter.restartGame()
             }
         alert.addAction(action)
+        alert.view.accessibilityIdentifier = "alert"
         present(alert, animated: true)
     }
     
@@ -98,6 +99,7 @@ final class MovieQuizViewController: UIViewController {
             guard let self = self else { return }
             self.presenter.restartGame()
         }
+        alert.view.accessibilityIdentifier = "alert"
         alert.addAction(action)
     }
     
